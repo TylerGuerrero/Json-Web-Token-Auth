@@ -1,52 +1,13 @@
 const router = require('express').Router()
-const Events = require('../models/Events')
 
-router.get('/', async (req, res) => {
-    try {
-        const events = await Events.find({})
-        return res.status(201).json({events})
-    } catch (err) {
-        return res.status(500).json({err: err.message})
-    }
-})
+const { event_get, event_delete, event_post, event_put } = require('../controllers/EventController')
 
-router.post('/', async (req, res) => {
-    const { title, description, date } = req.body
+router.get('/', event_get)
 
-    try {
-        const event = await Events.create({title, description, date})
-        return res.status(201).json({event})
-    } catch(err) {
-        return res.status(500).json({err: err.message})
-    }
-})
+router.post('/', event_post)
 
-router.put('/:id', async (req, res) => {
-    const { title, description, date } = req.body
-    const eventId = req.params.id
+router.put('/:id', event_put)
 
-    const updatedEvent = {}
-    if (title) updatedEvent.title = title 
-    if (description) updatedEvent.description = description
-    if (date) updatedEvent.date = date
-
-    try {
-        const event = await Events.findByIdAndUpdate(eventId, {$set: updatedEvent}, {new: true})
-        return res.status(201).json({event})
-    } catch(err) {  
-        return res.status(500).json({err: err.message})
-    }
-})
-
-router.delete('/:id', async (req, res) => {
-    const eventId = req.params.id
-
-    try {
-        await Events.findByIdAndDelete(eventId)
-        return res.status(201).json({msg: 'Event removed'})
-    } catch (err) {
-        return res.status(500).json({err: err.message})
-    }
-})
+router.delete('/:id', event_delete)
 
 module.exports = router
